@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Remove sales posts from Belgorod gift communities in newsfeed
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  Remove sales posts from Belgorod gift communities in newsfeed
 // @author       https://vk.com/id1176430
 // @match        https://vk.com/feed*
@@ -11,9 +11,24 @@
 (function() {
     'use strict';
 
-    window.addEventListener("load", remove_posts);
+    window.addEventListener("load", page_load);
     window.addEventListener("focus", remove_posts);
     window.addEventListener("scroll", remove_posts);
+    window.addEventListener("resize", remove_posts);
+
+    function page_load()
+    {
+        /* global Feed */
+        if( typeof Feed === "object" && typeof Feed.showNewPosts === "function" )
+        {
+            var FsNP = Feed.showNewPosts;
+            Feed.showNewPosts = function() {
+                FsNP();
+                remove_posts();
+            };
+        }
+        remove_posts();
+    }
 
     var comm = [
         /[/]besplatno31belgorod/,
